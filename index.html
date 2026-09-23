@@ -146,7 +146,7 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
 
 <!-- 設定 -->
 <section id="setup" class="screen">
-  <div class="card"><h2>① テスト日</h2><input type="date" id="testDate"></div>
+  <div class="card"><h2>① テスト日</h2><input type="date" id="testDate" oninput="draftDate=this.value" onchange="draftDate=this.value"></div>
   <div class="card">
     <div class="row"><h2>② 教科と目標点</h2><button onclick="addSubject()">＋教科を追加</button></div>
     <div class="muted">前回の点数は、分からなければ空欄でOK。空欄のときは、苦手度から目安を出します。</div>
@@ -410,13 +410,14 @@ function delAssign(i){const a=data.assignments[i];if(!a)return;openModal('提出
 /* ---------- 設定 ---------- */
 function addSubject(){data.subjects.push({id:uid(),name:'',confidence:3,current:'',target:''});renderSetup()}
 function delSubject(i){data.subjects.splice(i,1);renderSetup()}
+let draftDate=null;   // 保存前に入力したテスト日（教科の追加・削除で再描画しても消えないように保持）
 function renderSetup(){
-  $('testDate').value=data.testDate;
+  $('testDate').value=draftDate!==null?draftDate:data.testDate;
   $('subjects').innerHTML=data.subjects.map((s,i)=>`<div class="subjectCard"><div class="row"><b>教科 ${i+1}</b><button class="mini danger" onclick="delSubject(${i})">削除</button></div><label>教科名</label><input value="${esc(s.name)}" placeholder="例：数学" oninput="data.subjects[${i}].name=this.value"><label>苦手度（1=得意、5=苦手）</label><select onchange="data.subjects[${i}].confidence=+this.value">${[1,2,3,4,5].map(n=>`<option value="${n}" ${s.confidence==n?'selected':''}>${n}</option>`).join('')}</select><div class="grid2"><div><label>前回のテストの点数（任意）</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="分からなければ空欄" value="${esc(s.current)}" oninput="data.subjects[${i}].current=this.value"></div><div><label>目標点</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="例：80" value="${esc(s.target)}" oninput="data.subjects[${i}].target=this.value"></div></div></div>`).join('')||'<div class="empty">「＋教科を追加」から入れてね。</div>';
   $('weekInputs').innerHTML=[1,2,3,4,5,6,0].map(i=>`<div class="wd"><label>${WD[i]}</label><input type="number" inputmode="numeric" min="0" step="5" value="${data.weekMin[i]}" oninput="data.weekMin[${i}]=Math.max(0,+this.value||0)"><span class="muted">分</span></div>`).join('');
 }
 function saveSetup(){
-  data.testDate=val('testDate');
+  data.testDate=val('testDate');draftDate=null;
   data.subjects=data.subjects.filter(s=>s.name.trim()).map(s=>({...s,name:s.name.trim()}));
   if(!data.testDate){alert('① テスト日を入れてね');return}
   if(!data.subjects.length){alert('② 教科を1つ以上入れてね');return}
