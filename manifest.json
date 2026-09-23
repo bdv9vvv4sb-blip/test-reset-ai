@@ -1,0 +1,9 @@
+{
+  "name":"テスト2週間前リセット",
+  "short_name":"テストリセット",
+  "start_url":"./",
+  "display":"standalone",
+  "background_color":"#f5f7fb",
+  "theme_color":"#111827",
+  "lang":"ja"
+}

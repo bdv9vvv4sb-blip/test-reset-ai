@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.json">
+<title>テスト2週間前リセット</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e5e9f0;--accent:#111827;--soft:#eef2f7;--danger:#dc2626;--ok:#16a34a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}
+.app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:84px}.top{padding:22px 18px 10px}.top h1{font-size:23px;margin:0 0 4px}.top p{margin:0;color:var(--muted);font-size:13px}
+nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center}
+.navin{max-width:720px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{border:0;background:none;padding:11px 4px 10px;color:var(--muted);font-size:11px}nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{color:var(--accent)}
+main{padding:8px 14px}.screen{display:none}.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}
+.hero{background:#111827;color:#fff;border-radius:20px;padding:20px;margin-bottom:12px}.hero .big{font-size:35px;font-weight:800}.hero small{opacity:.72}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--soft);border-radius:14px;padding:13px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}
+h2{font-size:17px;margin:4px 0 10px}h3{font-size:14px;margin:0 0 5px}
+button,.btn{border:0;border-radius:12px;padding:11px 14px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}
+button.secondary{background:var(--soft);color:var(--text)}button.danger{background:#fee2e2;color:#991b1b}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;font:inherit;background:#fff}textarea{min-height:80px;resize:vertical}
+label{font-size:12px;color:var(--muted);display:block;margin:10px 0 5px}
+.task{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:flex-start}.task.done{opacity:.55}.task.done .tt{text-decoration:line-through}
+.check{width:23px;height:23px;border-radius:7px;border:2px solid #cbd2dd;flex:none}.task.done .check{background:#16a34a;border-color:#16a34a}
+.badge{font-size:11px;border-radius:999px;padding:4px 8px;background:var(--soft);white-space:nowrap}.badge.red{background:#fee2e2;color:#991b1b}.badge.green{background:#dcfce7;color:#166534}
+.muted{color:var(--muted);font-size:12px}.empty{text-align:center;color:var(--muted);padding:28px 10px}
+.chat{height:calc(100vh - 170px);min-height:420px;display:flex;flex-direction:column}.messages{flex:1;overflow:auto;padding-bottom:10px}
+.msg{max-width:88%;padding:11px 13px;border-radius:15px;margin:7px 0;white-space:pre-wrap;font-size:14px;line-height:1.55}.ai{background:#fff;border:1px solid var(--line);align-self:flex-start}.me{background:#111827;color:#fff;align-self:flex-end}
+.chatbox{display:flex;gap:7px;padding-top:8px}.chatbox input{flex:1}
+.hidden{display:none!important}.small{font-size:11px}.divider{height:1px;background:var(--line);margin:13px 0}
+@media(min-width:650px){.top{padding-top:30px}main{padding:8px 18px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><h1>テスト2週間前リセット</h1><p>「今日なにやる？」を迷わないための勉強管理</p></header>
+
+<main>
+<section id="home" class="screen active">
+  <div class="hero">
+    <small>テストまで</small>
+    <div class="big" id="daysLeft">設定してください</div>
+    <div id="testDateText" class="small"></div>
+  </div>
+  <div class="grid2">
+    <div class="stat"><strong id="todayCount">0</strong><span>今日の残り</span></div>
+    <div class="stat"><strong id="studyMin">0</strong><span>今日の勉強分</span></div>
+  </div>
+  <div class="card"><div class="row"><h2>今日やる3つ</h2><button class="secondary" onclick="generateTasks()">再計算</button></div><div id="todayTasks"></div></div>
+  <div class="card"><h2>提出物</h2><div id="dueList"></div></div>
+</section>
+
+<section id="setup" class="screen">
+  <div class="card">
+    <h2>テスト設定</h2>
+    <label>テスト日</label><input type="date" id="testDate">
+    <label>1日に勉強できる時間（分）</label><input type="number" id="availableMin" min="10" value="90">
+  </div>
+  <div class="card">
+    <div class="row"><h2>教科</h2><button onclick="addSubject()">＋追加</button></div>
+    <div id="subjects"></div>
+  </div>
+  <div class="card">
+    <div class="row"><h2>提出物</h2><button onclick="addAssignment()">＋追加</button></div>
+    <div id="assignments"></div>
+  </div>
+  <button onclick="saveSetup()" style="width:100%">保存して計画を作る</button>
+</section>
+
+<section id="chat" class="screen">
+  <div class="card chat">
+    <div id="messages" class="messages"></div>
+    <div class="chatbox"><input id="chatInput" placeholder="例：今日は30分しかできない"><button onclick="sendChat()">送信</button></div>
+    <div class="divider"></div>
+    <button class="secondary" style="width:100%" onclick="copyAIPrompt()">ChatGPTに相談する用の文章をコピー</button>
+  </div>
+</section>
+
+<section id="log" class="screen">
+  <div class="card"><h2>勉強記録</h2><div id="logList"></div></div>
+  <div class="card"><h2>データ</h2><button class="danger" onclick="resetAll()">全部リセット</button></div>
+</section>
+</main>
+
+<nav><div class="navin">
+<button class="active" onclick="show('home',this)"><b>⌂</b>ホーム</button>
+<button onclick="show('setup',this)"><b>⚙</b>設定</button>
+<button onclick="show('chat',this)"><b>💬</b>AI相談</button>
+<button onclick="show('log',this)"><b>✓</b>記録</button>
+</div></nav>
+</div>
+
+<script>
+const KEY="testResetAI_v1";
+let data=JSON.parse(localStorage.getItem(KEY)||'null')||{
+ testDate:"",availableMin:90,subjects:[],assignments:[],tasks:[],logs:[],messages:[]
+};
+
+function uid(){return "id_"+Date.now()+"_"+Math.random().toString(36).slice(2,9)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){alert("この環境ではデータ保存が使えません。Safariで開いてください。");return false}}
+function parseDate(s){return s?new Date(s+"T00:00:00"):null}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function daysUntil(){
+ if(!data.testDate)return null;
+ const t=parseDate(data.testDate), n=new Date(); n.setHours(0,0,0,0);
+ return Math.ceil((t-n)/86400000);
+}
+function show(id,btn){
+ document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");
+ document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));if(btn)btn.classList.add("active");
+ if(id==="home")renderHome();if(id==="setup")renderSetup();if(id==="log")renderLog();if(id==="chat")renderChat();
+}
+function renderHome(){
+ const d=daysUntil();document.getElementById("daysLeft").textContent=d===null?"設定してください":d<0?"テスト終了":d===0?"今日":d+"日";
+ document.getElementById("testDateText").textContent=data.testDate?"テスト日："+data.testDate:"";
+ const remaining=data.tasks.filter(t=>!t.done);document.getElementById("todayCount").textContent=remaining.length;
+ document.getElementById("studyMin").textContent=data.logs.filter(x=>x.date===today()).reduce((a,x)=>a+x.min,0);
+ document.getElementById("todayTasks").innerHTML=remaining.length?remaining.slice(0,3).map(taskHTML).join(""):'<div class="empty">今日のタスクはありません。設定から教科・提出物を入れてください。</div>';
+ const due=data.assignments.filter(a=>!a.done).sort((a,b)=>new Date(a.due)-new Date(b.due)).slice(0,5);
+ document.getElementById("dueList").innerHTML=due.length?due.map(a=>`<div class="task"><div style="flex:1"><b>${esc(a.name)}</b><div class="muted">期限 ${esc(a.due)} ・ 残り${a.pages||a.work||"未設定"}</div></div><span class="badge ${new Date(a.due)<=new Date(Date.now()+172800000)?"red":""}">${new Date(a.due)<=new Date(Date.now()+172800000)?"急ぎ":"予定"}</span></div>`).join(""):'<div class="empty">提出物なし</div>';
+}
+function taskHTML(t){
+ return `<div class="task ${t.done?'done':''}" onclick="toggleTask('${t.id}')"><div class="check"></div><div style="flex:1"><div class="tt"><b>${esc(t.title)}</b></div><div class="muted">${esc(t.reason||"今日の優先タスク")} ・ 約${t.min}分</div></div><span class="badge">${esc(t.subject||"")}</span></div>`
+}
+function toggleTask(id){let t=data.tasks.find(x=>x.id===id);if(t){t.done=!t.done;if(t.done)data.logs.push({date:today(),min:t.min,task:t.title});save();renderHome();renderLog()}}
+function today(){return new Date().toISOString().slice(0,10)}
+function addSubject(){data.subjects.push({id:uid(),name:"",confidence:3,target:""});renderSetup()}
+function addAssignment(){data.assignments.push({id:uid(),name:"",due:today(),work:"",done:false});renderSetup()}
+function renderSetup(){
+ document.getElementById("testDate").value=data.testDate;document.getElementById("availableMin").value=data.availableMin;
+ document.getElementById("subjects").innerHTML=data.subjects.map((s,i)=>`<div class="card"><label>教科名</label><input value="${esc(s.name)}" oninput="data.subjects[${i}].name=this.value"><label>苦手度（1=得意、5=苦手）</label><select onchange="data.subjects[${i}].confidence=+this.value">${[1,2,3,4,5].map(n=>`<option ${s.confidence==n?'selected':''}>${n}</option>`).join("")}</select><label>目標点（任意）</label><input value="${esc(s.target)}" oninput="data.subjects[${i}].target=this.value"></div>`).join("")||'<div class="empty">「＋追加」から教科を入れてください。</div>';
+ document.getElementById("assignments").innerHTML=data.assignments.map((a,i)=>`<div class="card"><label>提出物</label><input value="${esc(a.name)}" oninput="data.assignments[${i}].name=this.value"><label>期限</label><input type="date" value="${esc(a.due)}" oninput="data.assignments[${i}].due=this.value"><label>量（例：ワーク30ページ）</label><input value="${esc(a.work)}" oninput="data.assignments[${i}].work=this.value"></div>`).join("")||'<div class="empty">「＋追加」から提出物を入れてください。</div>';
+}
+function saveSetup(){
+ data.testDate=document.getElementById("testDate").value;
+ data.availableMin=Math.max(10,+document.getElementById("availableMin").value||90);
+ data.subjects=data.subjects.filter(s=>s.name.trim());
+ data.assignments=data.assignments.filter(a=>a.name.trim());
+ if(!data.testDate){alert("テスト日を設定してね");return}
+ if(!data.subjects.length){alert("少なくとも1教科追加してね");return}
+ save(); generateTasks();
+ addAI("AI","設定を保存したよ。今の情報から、今日の優先タスクを3つに絞った。");
+ alert("設定を保存しました！");
+ show("home",document.querySelector("nav button"));renderHome();
+}
+function generateTasks(){
+ const d=daysUntil();let pool=[];
+ data.assignments.filter(a=>!a.done).forEach(a=>{
+   const until=Math.max(0,Math.ceil((new Date(a.due)-new Date())/86400000));
+   let score=(until<=2?10:until<=4?7:until<=7?4:1);
+   pool.push({title:a.name+"を進める",subject:"提出物",min:Math.max(15,Math.floor(data.availableMin*.2)),score,reason:until<=2?"期限が近い":"提出物を前倒し"});
+ });
+ data.subjects.forEach(s=>{
+   let score=s.confidence*2+(d!==null&&d<=4?4:2);
+   pool.push({title:s.name+"：苦手分野を集中して解く",subject:s.name,min:Math.max(15,Math.floor(data.availableMin*.45)),score,reason:s.confidence>=4?"苦手度が高い":"得点を伸ばす"});
+ });
+ pool.sort((a,b)=>b.score-a.score);
+ let mins=data.availableMin, chosen=[];
+ for(const x of pool){if(chosen.length>=3)break;let m=Math.min(x.min,Math.max(10,mins));x.min=m;chosen.push({...x,id:uid(),done:false});mins-=m}
+ data.tasks=chosen;save();renderHome();
+}
+function addAI(who,text){data.messages.push({who,text});save()}
+function renderChat(){
+ const box=document.getElementById("messages");box.innerHTML=data.messages.map(m=>`<div class="msg ${m.who==="AI"?"ai":"me"}">${esc(m.text)}</div>`).join("");box.scrollTop=box.scrollHeight;
+}
+function sendChat(){
+ const inp=document.getElementById("chatInput"),text=inp.value.trim();if(!text)return;inp.value="";
+ addAI("ME",text);let reply=localReply(text);addAI("AI",reply);renderChat();
+}
+function localReply(t){
+ if(/30分|30 分/.test(t)){data.availableMin=30;generateTasks();return"30分しかないなら、全部やろうとしなくてOK。今の優先順位を30分用に組み直したよ。ホームの「今日やる3つ」を見て。";}
+ if(/できなかった|サボ|無理だった/.test(t)){generateTasks();return"了解。昨日の分を全部取り返そうとすると崩れやすいから、期限が近いものと苦手科目を優先して組み直した。";}
+ if(/終わった|できた|完了/.test(t)){generateTasks();return"おつかれ。完了した分を踏まえて、残りから優先順位を更新したよ。";}
+ if(/数学|英語|国語|理科|社会/.test(t)){generateTasks();return"その教科を優先したい感じだね。設定してある苦手度とテストまでの日数を使って、今日の3つを再計算したよ。";}
+ return"内容を受け取ったよ。今のバージョンでは、テスト日・教科の苦手度・提出物・勉強時間から優先順位を組み直せる。たとえば「今日は30分しかできない」「昨日できなかった」みたいに送ってみて。";
+}
+function copyAIPrompt(){
+ const prompt=`高校生のテスト勉強計画を作ってください。\\nテスト日：${data.testDate||"未設定"}\\n今日から残り：${daysUntil()??"不明"}日\\n1日の勉強可能時間：${data.availableMin}分\\n教科：${data.subjects.map(s=>`${s.name}(苦手度${s.confidence}/5、目標${s.target||"未設定"})`).join("、")||"未設定"}\\n提出物：${data.assignments.map(a=>`${a.name}(期限${a.due}、量${a.work||"未設定"})`).join("、")||"なし"}\\n\\n「今日やること」を最大3つ、具体的なページ・問題数・時間まで決めてください。期限が近い提出物と苦手科目を優先し、無理な計画にはしないでください。`;
+ navigator.clipboard?.writeText(prompt);alert("ChatGPTに貼り付ける文章をコピーしたよ。");
+}
+function renderLog(){
+ document.getElementById("logList").innerHTML=data.logs.slice().reverse().slice(0,30).map(x=>`<div class="task"><div style="flex:1"><b>${esc(x.task)}</b><div class="muted">${x.date} ・ ${x.min}分</div></div></div>`).join("")||'<div class="empty">まだ記録なし</div>';
+}
+function resetAll(){if(confirm("全部のデータを消しますか？")){localStorage.removeItem(KEY);location.reload()}}
+// 初期表示
+renderSetup();renderHome();renderChat();renderLog();
+// iPhone/Safariで戻ってきた時も再描画
+window.addEventListener("pageshow",()=>{renderSetup();renderHome();renderChat();renderLog()});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+</script>
+</body>
+</html>
