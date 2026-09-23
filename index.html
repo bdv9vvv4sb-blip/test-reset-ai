@@ -10,6 +10,7 @@
 :root{--bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#687386;--line:#e5e9f0;--accent:#111827;--soft:#eef2f7;--ok:#16a34a;--warn:#d97706;--danger:#dc2626}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}.app{max-width:720px;margin:auto;min-height:100vh;padding-bottom:88px}.top{padding:22px 18px 10px}.top h1{font-size:23px;margin:0 0 4px}.top p{margin:0;color:var(--muted);font-size:13px}main{padding:8px 14px}.screen{display:none}.screen.active{display:block}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin:10px 0;box-shadow:0 2px 12px rgba(20,30,50,.04)}.hero{background:#111827;color:#fff;border-radius:20px;padding:20px;margin-bottom:12px}.hero .big{font-size:35px;font-weight:800}.hero small{opacity:.72}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:var(--soft);border-radius:14px;padding:13px}.stat strong{display:block;font-size:22px}.stat span{font-size:12px;color:var(--muted)}h2{font-size:17px;margin:4px 0 10px}h3{font-size:14px;margin:0 0 5px}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}button,.btn{border:0;border-radius:12px;padding:11px 14px;background:var(--accent);color:#fff;font-weight:700;cursor:pointer}button.secondary{background:var(--soft);color:var(--text)}button.danger{background:#fee2e2;color:#991b1b}button:disabled{opacity:.45}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:11px;font:inherit;background:#fff}textarea{min-height:80px;resize:vertical}label{font-size:12px;color:var(--muted);display:block;margin:10px 0 5px}.task{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0;display:flex;gap:10px;align-items:flex-start}.task.done{opacity:.55}.task.done .tt{text-decoration:line-through}.check{width:23px;height:23px;border-radius:7px;border:2px solid #cbd2dd;flex:none}.task.done .check{background:var(--ok);border-color:var(--ok)}.badge{font-size:11px;border-radius:999px;padding:4px 8px;background:var(--soft);white-space:nowrap}.badge.red{background:#fee2e2;color:#991b1b}.badge.green{background:#dcfce7;color:#166534}.badge.orange{background:#ffedd5;color:#9a3412}.muted{color:var(--muted);font-size:12px}.empty{text-align:center;color:var(--muted);padding:28px 10px}.divider{height:1px;background:var(--line);margin:13px 0}.small{font-size:11px}.chat{height:calc(100vh - 170px);min-height:420px;display:flex;flex-direction:column}.messages{flex:1;overflow:auto;padding-bottom:10px}.msg{max-width:90%;padding:11px 13px;border-radius:15px;margin:7px 0;white-space:pre-wrap;font-size:14px;line-height:1.55}.ai{background:#fff;border:1px solid var(--line);align-self:flex-start}.me{background:#111827;color:#fff;align-self:flex-end}.chatbox{display:flex;gap:7px;padding-top:8px}.chatbox input{flex:1}.hidden{display:none!important}.subjectCard{border:1px solid var(--line);border-radius:14px;padding:12px;margin:8px 0}.meter{height:9px;background:#edf0f4;border-radius:99px;overflow:hidden;margin-top:7px}.meter i{display:block;height:100%;background:#111827;border-radius:99px}.miniBar{height:12px;background:#edf0f4;border-radius:99px;overflow:hidden}.miniBar i{display:block;height:100%;background:#111827}.priorityItem{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}.priorityItem:last-child{border-bottom:0}.chart{display:flex;align-items:flex-end;gap:7px;height:160px;padding:10px 2px 0}.barCol{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}.bar{width:100%;max-width:32px;border-radius:8px 8px 3px 3px;background:#111827;min-height:2px}.barLabel{font-size:9px;color:var(--muted);white-space:nowrap}.barVal{font-size:10px}.notice{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:12px;padding:10px;font-size:12px;color:var(--muted)}
 nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:center}.navin{max-width:720px;width:100%;display:grid;grid-template-columns:repeat(4,1fr)}nav button{border:0;background:none;padding:11px 4px 10px;color:var(--muted);font-size:11px}nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{color:var(--accent)}
+input[type=checkbox]{width:auto;flex:none;margin-top:3px}.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--text);margin:14px 0 4px}.seg{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--soft);padding:5px;border-radius:14px;margin:8px 0}.seg button{background:none;color:var(--muted);padding:10px 6px;font-size:13px}.seg button.on{background:#fff;color:var(--text);box-shadow:0 1px 6px rgba(20,30,50,.08)}#askPreviewBox{min-height:190px;margin-top:10px;font-size:13px;line-height:1.55}.askStatus{margin-top:10px;font-size:13px;line-height:1.7}.askStatus a{color:var(--accent);font-weight:700}.logItem{border-bottom:1px solid var(--line);padding:10px 0;cursor:pointer}.logItem:last-child{border-bottom:0}.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 16px;border-radius:999px;font-size:13px;z-index:30;max-width:90%}
 @media(min-width:650px){.top{padding-top:30px}main{padding:8px 18px}}
 </style>
 </head>
@@ -21,6 +22,7 @@ nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top
   <div class="hero"><small>テストまで</small><div class="big" id="daysLeft">設定してください</div><div id="testDateText" class="small"></div></div>
   <div class="grid3"><div class="stat"><strong id="todayCount">0</strong><span>今日の残り</span></div><div class="stat"><strong id="studyMin">0</strong><span>今日の勉強分</span></div><div class="stat"><strong id="targetGap">-</strong><span>目標との差</span></div></div>
   <div class="card"><div class="row"><h2>今日やる3つ</h2><button class="secondary" onclick="generateTasks()">再計算</button></div><div id="todayTasks"></div></div>
+  <div class="card"><div class="row"><div><h2 style="margin-bottom:2px">わからない所をAIに質問</h2><div class="muted">教科・テスト日つきの質問文を自動で作ってChatGPTへ</div></div><button onclick="openAsk()">質問する</button></div></div>
   <div class="card"><div class="row"><h2>教科の優先順位</h2><button class="secondary" onclick="show('setup',document.querySelectorAll('nav button')[1])">編集</button></div><div id="priorityList"></div></div>
   <div class="card"><h2>目標点までの必要量（目安）</h2><div id="goalPlan"></div><div class="notice" style="margin-top:10px">現在点と目標点の差から計算した「目安」です。実際の必要時間は教科や問題の難易度で変わります。</div></div>
   <div class="card"><h2>勉強時間の推移</h2><div id="studyChart"></div></div>
@@ -33,7 +35,26 @@ nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top
   <button onclick="saveSetup()" style="width:100%">保存して計画を作る</button>
 </section>
 <section id="chat" class="screen">
-  <div class="card chat"><div id="messages" class="messages"></div><div class="chatbox"><input id="chatInput" placeholder="例：今日は30分しかできない"><button onclick="sendChat()">送信</button></div><div class="divider"></div><button class="secondary" style="width:100%" onclick="copyAIPrompt()">ChatGPTに相談する用の文章をコピー</button></div>
+  <div class="seg"><button id="segAsk" class="on" onclick="chatTab('ask')">ChatGPTに質問</button><button id="segPlan" onclick="chatTab('plan')">計画を調整</button></div>
+  <div id="askPane">
+    <div class="card">
+      <h2>AIに質問する</h2>
+      <div class="muted">質問を書くと、教科・テスト日・目標点を入れた文章を自動で作ります。コピーしてChatGPTに貼り付けるだけ（API代0円）。</div>
+      <label>教科</label><select id="askSubject" onchange="askDirty()"></select>
+      <label>何をしたい？</label><select id="askTypeSel" onchange="onTypeChange();askDirty()"><option value="explain">わからない所を解説してほしい</option><option value="solve">問題の解き方を教えてほしい</option><option value="practice">演習問題を出してほしい</option><option value="quiz">一問一答でチェックしてほしい</option><option value="plan">勉強計画を相談したい</option></select>
+      <label>質問・問題文</label><textarea id="askText" oninput="askDirty()"></textarea>
+      <label>学年・レベル</label><input id="askGrade" placeholder="例：高校2年" oninput="askDirty()">
+      <label class="chk" id="askHintRow"><input type="checkbox" id="askHint" checked onchange="askDirty()"><span>答えをすぐ出さず、考え方・ヒントから教えてもらう</span></label>
+      <button style="width:100%;margin-top:12px" onclick="askGo()">コピーしてChatGPTを開く</button>
+      <button class="secondary" style="width:100%;margin-top:8px" onclick="showPreview()">作られる文章を確認・編集する</button>
+      <textarea id="askPreviewBox" class="hidden"></textarea>
+      <div id="askStatus" class="askStatus"></div>
+    </div>
+    <div class="card"><h2>質問履歴</h2><div id="askLog"></div></div>
+  </div>
+  <div id="planPane" class="hidden">
+    <div class="card chat"><div id="messages" class="messages"></div><div class="chatbox"><input id="chatInput" placeholder="例：今日は30分しかできない"><button onclick="sendChat()">送信</button></div><div class="divider"></div><button class="secondary" style="width:100%" onclick="copyPlanPrompt()">計画づくりの相談文をコピー（ChatGPT用）</button></div>
+  </div>
 </section>
 <section id="log" class="screen">
   <div class="card"><h2>勉強記録</h2><div id="logList"></div></div><div class="card"><h2>データ</h2><button class="danger" onclick="resetAll()">全部リセット</button></div>
@@ -45,15 +66,17 @@ nav{position:fixed;z-index:10;bottom:0;left:0;right:0;background:#fff;border-top
 const KEY="testResetAI_v2";
 let data=JSON.parse(localStorage.getItem(KEY)||'null');
 if(!data){const old=JSON.parse(localStorage.getItem('testResetAI_v1')||'null');data=old?migrate(old):{testDate:"",availableMin:90,subjects:[],assignments:[],tasks:[],logs:[],messages:[],history:{}}}
+data.aiLog=data.aiLog||[];data.grade=data.grade||'高校生';
 function migrate(o){o.subjects=(o.subjects||[]).map(s=>({...s,current:s.current||""}));return {...o,messages:o.messages||[],history:o.history||{}}}
 function uid(){return "id_"+Date.now()+"_"+Math.random().toString(36).slice(2,9)}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(data));return true}catch(e){alert('データ保存に失敗しました。Safariで開いてください。');return false}}
 function parseDate(s){return s?new Date(s+'T00:00:00'):null}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function today(){return new Date().toISOString().slice(0,10)}
+function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function today(){return ymd(new Date())}
 function daysUntil(){if(!data.testDate)return null;const t=parseDate(data.testDate),n=new Date();n.setHours(0,0,0,0);return Math.ceil((t-n)/86400000)}
 function daysBetween(a,b){return Math.ceil((parseDate(a)-parseDate(b))/86400000)}
-function show(id,btn){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(id==='home')renderHome();if(id==='setup')renderSetup();if(id==='chat')renderChat();if(id==='log')renderLog()}
+function show(id,btn){document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active');if(id==='home')renderHome();if(id==='setup')renderSetup();if(id==='chat'){renderChat();renderAsk()}if(id==='log')renderLog()}
 function scoreSubject(s){const gap=Math.max(0,(+s.target||0)-(+s.current||0));const confidence=+s.confidence||3;const d=daysUntil();const urgency=d===null?1:(d<=3?1.8:d<=7?1.35:1);return gap*1.7+confidence*7*urgency}
 function neededMinutes(s){const gap=Math.max(0,(+s.target||0)-(+s.current||0));const confidence=+s.confidence||3;return Math.round(gap*(8+confidence*2))}
 function renderHome(){
@@ -81,10 +104,10 @@ function generateTasks(){
  pool.sort((a,b)=>b.score-a.score);let mins=data.availableMin,chosen=[];for(const x of pool){if(chosen.length>=3||mins<10)break;const m=Math.min(x.min,mins);chosen.push({...x,min:m,id:uid(),done:false});mins-=m}data.tasks=chosen;save();renderHome()}
 function renderPriority(){const list=data.subjects.slice().sort((a,b)=>scoreSubject(b)-scoreSubject(a));document.getElementById('priorityList').innerHTML=list.length?list.map((s,i)=>{const gap=Math.max(0,(+s.target||0)-(+s.current||0));const need=neededMinutes(s);return `<div class="priorityItem"><div><b>${i+1}. ${esc(s.name)}</b><div class="muted">現在${esc(s.current||'-')}点 → 目標${esc(s.target||'-')}点 ・ 目安${need}分</div></div><span class="badge ${i===0?'red':''}">${gap>0?'あと'+gap+'点':'目標達成'}</span></div>`}).join(''):'<div class="empty">教科を設定すると表示されます。</div>'}
 function renderGoalPlan(){const el=document.getElementById('goalPlan');const d=Math.max(1,daysUntil()||1);const arr=data.subjects.filter(s=>s.target!=='').map(s=>{const need=neededMinutes(s),per=Math.ceil(need/d),gap=Math.max(0,(+s.target||0)-(+s.current||0));return `<div class="subjectCard"><div class="row"><b>${esc(s.name)}</b><span class="badge">あと${gap}点</span></div><div class="muted">合計の目安：${need}分 → 1日約${per}分</div><div class="meter"><i style="width:${Math.min(100,(+s.current||0)/(+s.target||1)*100)}%"></i></div></div>`});el.innerHTML=arr.length?arr.join(''):'<div class="empty">設定画面で現在点と目標点を入力すると表示されます。</div>'}
-function renderChart(){const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const key=dt.toISOString().slice(0,10);days.push({key,label:(dt.getMonth()+1)+'/'+dt.getDate(),min:data.history[key]||0})}const max=Math.max(60,...days.map(x=>x.min));document.getElementById('studyChart').innerHTML=`<div class="chart">${days.map(x=>`<div class="barCol"><span class="barVal">${x.min}</span><div class="bar" style="height:${Math.max(2,x.min/max*115)}px"></div><span class="barLabel">${x.label}</span></div>`).join('')}</div><div class="muted" style="text-align:center">過去7日間・完了したタスクの勉強時間（分）</div>`}
+function renderChart(){const days=[];for(let i=6;i>=0;i--){const dt=new Date();dt.setDate(dt.getDate()-i);const key=ymd(dt);days.push({key,label:(dt.getMonth()+1)+'/'+dt.getDate(),min:data.history[key]||0})}const max=Math.max(60,...days.map(x=>x.min));document.getElementById('studyChart').innerHTML=`<div class="chart">${days.map(x=>`<div class="barCol"><span class="barVal">${x.min}</span><div class="bar" style="height:${Math.max(2,x.min/max*115)}px"></div><span class="barLabel">${x.label}</span></div>`).join('')}</div><div class="muted" style="text-align:center">過去7日間・完了したタスクの勉強時間（分）</div>`}
 function addAI(who,text){data.messages.push({who,text});save()}
 function renderChat(){const box=document.getElementById('messages');if(!data.messages.length){box.innerHTML='<div class="msg ai">こんにちは。テスト日・教科・現在点・目標点・提出物をもとに、今日やることを一緒に決めるよ。<br>「今日は30分しかない」「数学を優先したい」みたいに送ってみて。</div>'}else{box.innerHTML=data.messages.map(m=>`<div class="msg ${m.who==='AI'?'ai':'me'}">${esc(m.text)}</div>`).join('')}box.scrollTop=box.scrollHeight}
-function sendChat(){const inp=document.getElementById('chatInput'),text=inp.value.trim();if(!text)return;inp.value='';addAI('ME',text);const reply=localReply(text);addAI('AI',reply);renderChat();renderHome()}
+function sendChat(){const inp=document.getElementById('chatInput'),text=inp.value.trim();if(!text)return;inp.value='';addAI('ME',text);if(isAskLike(text)){handoffAsk(text);return}const reply=localReply(text);addAI('AI',reply);renderChat();renderHome()}
 function localReply(t){
  const minMatch=t.match(/(\d+)\s*分/);if(minMatch){data.availableMin=Math.max(10,+minMatch[1]);generateTasks();return `今日は${data.availableMin}分として計画を組み直したよ。期限と目標点との差を優先して、ホームの「今日やる3つ」を更新した。`}
  if(/サボ|できなかった|昨日|遅れ/.test(t)){generateTasks();return '遅れた分を全部取り返すのではなく、期限が近いものと目標点との差が大きい教科を優先して組み直したよ。'}
@@ -92,11 +115,69 @@ function localReply(t){
  const subject=data.subjects.find(s=>t.includes(s.name));if(subject){const others=data.subjects.filter(s=>s.id!==subject.id).sort((a,b)=>scoreSubject(b)-scoreSubject(a));data.tasks.unshift({id:uid(),title:subject.name+'：重点演習',subject:subject.name,min:Math.min(30,data.availableMin),score:999,reason:'AI相談で指定',done:false});data.tasks=data.tasks.slice(0,3);save();return `${subject.name}を優先するように今日のタスクを更新したよ。現在${subject.current||'-'}点→目標${subject.target||'-'}点、苦手度${subject.confidence}/5をもとに考えている。`}
  if(/優先|順位|どれから/.test(t)){renderHome();const top=data.subjects.slice().sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];generateTasks();return top?`今の条件なら、まず${top.name}を優先する計画にしたよ。理由は目標点との差・苦手度・テストまでの日数を合わせて計算している。`:'まず設定画面で教科を入れてね。'}
  if(/目標|何点|点数/.test(t)){const s=data.subjects.slice().sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];return s?`${s.name}は現在${s.current||'-'}点→目標${s.target||'-'}点。必要な勉強時間の目安は合計${neededMinutes(s)}分、テストまで${Math.max(1,daysUntil()||1)}日なら1日約${Math.ceil(neededMinutes(s)/Math.max(1,daysUntil()||1))}分。`:'設定画面で現在点と目標点を入れてね。'}
- return '了解。今のアプリでは「今日は30分しかない」「昨日できなかった」「数学を優先したい」「目標点までどれくらい？」みたいな相談に対応できるよ。';
+ return '了解。今のアプリでは「今日は30分しかない」「昨日できなかった」「数学を優先したい」「目標点までどれくらい？」みたいな相談に対応できるよ。\nわからない問題の解説は「ChatGPTに質問」タブから聞いてね。';
 }
-function copyAIPrompt(){const prompt=`高校生のテスト勉強計画を一緒に管理してください。\nテスト日：${data.testDate||'未設定'}\n残り：${daysUntil()??'不明'}日\n今日の勉強可能時間：${data.availableMin}分\n教科：${data.subjects.map(s=>`${s.name}(現在${s.current||'不明'}点、目標${s.target||'不明'}点、苦手度${s.confidence}/5)`).join('、')||'未設定'}\n提出物：${data.assignments.map(a=>`${a.name}(期限${a.due}、量${a.work||'不明'})`).join('、')||'なし'}\n\n今日やることを最大3つに絞り、各タスクの時間も決めてください。目標点との差、苦手度、期限、テストまでの日数を考慮してください。`;navigator.clipboard?.writeText(prompt);alert('ChatGPTに貼り付ける文章をコピーしたよ。')}
+const ASK_SHORT={explain:'解説',solve:'解き方',practice:'演習',quiz:'一問一答',plan:'計画'};
+const ASK_PH={explain:'例：二次関数の頂点の求め方がわからない',solve:'例：次の問題を解きたい：（問題文をここに貼る）',practice:'例：二次関数の最大・最小の問題を出してほしい',quiz:'例：英語の不規則動詞を覚えたい',plan:'例：今日は疲れていて2時間しかできない。何から？（空でもOK）'};
+function val(id){return document.getElementById(id).value}
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;top:0;left:0;opacity:0';document.body.appendChild(ta);ta.focus();ta.select();ta.setSelectionRange(0,t.length);let ok=false;try{ok=document.execCommand('copy')}catch(e){}document.body.removeChild(ta);return ok}
+function copyText(t){if(navigator.clipboard&&window.isSecureContext){return navigator.clipboard.writeText(t).then(()=>true).catch(()=>fallbackCopy(t))}return Promise.resolve(fallbackCopy(t))}
+function chatTab(w){const ask=w==='ask';document.getElementById('askPane').classList.toggle('hidden',!ask);document.getElementById('planPane').classList.toggle('hidden',ask);document.getElementById('segAsk').classList.toggle('on',ask);document.getElementById('segPlan').classList.toggle('on',!ask);if(ask)renderAsk();else renderChat()}
+function openAsk(){show('chat',document.querySelectorAll('nav button')[2]);chatTab('ask')}
+function onTypeChange(){const t=val('askTypeSel');document.getElementById('askText').placeholder=ASK_PH[t];document.getElementById('askHintRow').classList.toggle('hidden',t==='quiz'||t==='plan')}
+function askDirty(){document.getElementById('askPreviewBox').classList.add('hidden')}
+function getAskForm(){return{subject:val('askSubject'),type:val('askTypeSel'),text:val('askText'),grade:val('askGrade').trim(),hint:document.getElementById('askHint').checked}}
+function renderAsk(){
+ const sel=document.getElementById('askSubject'),cur=sel.value;
+ sel.innerHTML=data.subjects.map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')+'<option value="__none">その他（質問に書く）</option>';
+ if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
+ const gr=document.getElementById('askGrade');if(!gr.dataset.init){gr.value=data.grade||'';gr.dataset.init='1'}
+ onTypeChange();renderAskLog();
+}
+function renderAskLog(){const el=document.getElementById('askLog');el.innerHTML=data.aiLog.length?data.aiLog.slice(0,10).map((x,i)=>`<div class="logItem" onclick="reuseAsk(${i})"><b>${esc(x.subject==='__none'?'その他':x.subject)}</b> <span class="badge">${esc(ASK_SHORT[x.type]||'')}</span><div class="muted">${esc(x.date)} ・ ${esc((x.text||'').slice(0,40))}${(x.text||'').length>40?'…':''}</div></div>`).join(''):'<div class="empty">まだ質問はありません</div>'}
+function reuseAsk(i){const x=data.aiLog[i];if(!x)return;const sel=document.getElementById('askSubject');if([...sel.options].some(o=>o.value===x.subject))sel.value=x.subject;document.getElementById('askTypeSel').value=x.type;document.getElementById('askText').value=x.text||'';document.getElementById('askHint').checked=x.hint!==false;onTypeChange();askDirty();window.scrollTo({top:0,behavior:'smooth'})}
+function buildPrompt(f){
+ const d=daysUntil(),grade=f.grade||'高校生',sub=data.subjects.find(s=>s.name===f.subject),ctx=[];
+ if(data.testDate)ctx.push(`テスト日：${data.testDate}${d!==null&&d>=0?`（あと${d}日）`:''}`);
+ if(sub)ctx.push(`教科：${sub.name}（現在${sub.current||'不明'}点 → 目標${sub.target||'不明'}点、苦手度${sub.confidence}/5）`);
+ else if(f.subject&&f.subject!=='__none')ctx.push(`教科：${f.subject}`);
+ if(f.type==='plan'){
+  ctx.push(`今日の勉強可能時間：${data.availableMin}分`);
+  if(data.subjects.length)ctx.push('全教科：'+data.subjects.map(s=>`${s.name}(現在${s.current||'不明'}点、目標${s.target||'不明'}点、苦手度${s.confidence}/5)`).join('、'));
+  ctx.push('提出物：'+(data.assignments.filter(a=>!a.done).map(a=>`${a.name}(期限${a.due}、量${a.work||'不明'})`).join('、')||'なし'));
+  const rest=data.tasks.filter(t=>!t.done);if(rest.length)ctx.push('今日の予定（未完了）：'+rest.map(t=>`${t.title}(${t.min}分)`).join('、'));
+ }
+ const q=(f.text||'').trim();let ask='',rules=[];
+ if(f.type==='explain'){ask='【わからないこと】\n'+q;rules=[f.hint?'いきなり答えを出さず、まず考え方・全体像を説明する':'結論を先に言って、そのあと手順つきで説明する','むずかしい用語は、使うときに一言で説明する','身近な例やイメージも使う','最後に理解チェックの問題を1問だけ出して、私が答えるのを待つ']}
+ else if(f.type==='solve'){ask='【問題】\n'+q;rules=f.hint?['まず解き方のヒントを1つだけ出す','私が考えて返信したら、次のヒントを出す（詰まったら「ヒントちょうだい」と言います）','答えと途中式は、私が「答えを見せて」と言ってから出す']:['途中式つきで解き、なぜその式になるのかも説明する','最後に同じタイプの類題を1問出す']}
+ else if(f.type==='practice'){ask='【練習したい内容】\n'+q;rules=['テストに出やすい形式で、やさしい→ふつう→やや難しいの順に3問出す',f.hint?'解答と解説は、私が答えてから出す（まず問題だけ見せる）':'各問の解答と解説もつける','間違えたときは、どこでつまずいたかも教える']}
+ else if(f.type==='quiz'){ask='【チェックしたい範囲】\n'+q;rules=['一問一答形式で、1問ずつ出題する','私が答えたら、正誤と短い解説を返してから次の問題を出す','10問で一区切りにして、間違えた問題は最後にまとめて復習させる']}
+ else{ask='【相談したいこと】\n'+(q||'今日、何をどの順番でやるのがよいか決めたい');rules=['今日やることを最大3つに絞り、各タスクの時間（分）も決める','目標点との差・苦手度・期限・テストまでの日数を考慮する','各タスクに理由を1行で添える']}
+ return `あなたは${grade}向けのやさしい家庭教師です。テスト勉強を手伝ってください。`+(ctx.length?'\n\n【状況】\n'+ctx.join('\n'):'')+'\n\n'+ask+'\n\n【お願い】\n- 日本語で答える\n'+rules.map(r=>'- '+r).join('\n')
+}
+function showPreview(){const f=getAskForm();if(f.type!=='plan'&&!f.text.trim()){alert('質問を書いてね');return}const pv=document.getElementById('askPreviewBox');pv.value=buildPrompt(f);pv.classList.remove('hidden');pv.scrollIntoView({behavior:'smooth',block:'center'})}
+function askGo(){
+ const f=getAskForm();if(f.type!=='plan'&&!f.text.trim()){alert('質問を書いてね');return}
+ const pv=document.getElementById('askPreviewBox'),st=document.getElementById('askStatus');
+ const prompt=(!pv.classList.contains('hidden')&&pv.value.trim())?pv.value:buildPrompt(f);
+ pv.value=prompt;pv.classList.remove('hidden');
+ const link='<a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPTを開く</a>';
+ copyText(prompt).then(ok=>{st.innerHTML=ok?'✅ コピーしたよ。ChatGPTの入力欄に貼り付けて送信してね。<br>開かないときは '+link:'⚠️ 自動コピーに失敗。上の文章を長押ししてコピーしてから '+link});
+ window.open('https://chatgpt.com/','_blank','noopener');
+ if(f.grade)data.grade=f.grade;
+ data.aiLog.unshift({date:today(),subject:f.subject,type:f.type,text:f.text,hint:f.hint});data.aiLog=data.aiLog.slice(0,30);save();renderAskLog();
+}
+function isAskLike(t){return /(わから|分から|教えて|解き方|解説|なぜ|どうして|とは|意味|違い|[?？])/.test(t)&&!/(優先|順位|どれから|何から|計画|スケジュール|目標点|何点|点数)/.test(t)}
+function handoffAsk(text){
+ addAI('AI','この質問は中身の解説が必要だから、ChatGPTに聞く形にしたよ。「ChatGPTに質問」に移したので、確認してボタンを押してね。');
+ show('chat',document.querySelectorAll('nav button')[2]);chatTab('ask');
+ const sub=data.subjects.find(s=>s.name&&text.includes(s.name));if(sub)document.getElementById('askSubject').value=sub.name;
+ document.getElementById('askTypeSel').value='explain';onTypeChange();document.getElementById('askText').value=text;askDirty();
+}
+function copyPlanPrompt(){copyText(buildPrompt({type:'plan',subject:'__none',text:'',grade:data.grade,hint:false})).then(ok=>toast(ok?'コピーしたよ。ChatGPTに貼り付けてね':'コピーに失敗しました'))}
 function renderLog(){document.getElementById('logList').innerHTML=data.logs.slice().reverse().slice(0,50).map(x=>`<div class="task"><div style="flex:1"><b>${esc(x.task)}</b><div class="muted">${x.date} ・ ${x.min}分</div></div></div>`).join('')||'<div class="empty">まだ記録なし</div>'}
 function resetAll(){if(confirm('全部のデータを消しますか？')){localStorage.removeItem(KEY);location.reload()}}
-renderSetup();renderHome();renderChat();renderLog();window.addEventListener('pageshow',()=>{renderSetup();renderHome();renderChat();renderLog()});if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+renderSetup();renderHome();renderChat();renderAsk();renderLog();window.addEventListener('pageshow',()=>{renderSetup();renderHome();renderChat();renderAsk();renderLog()});if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body></html>
