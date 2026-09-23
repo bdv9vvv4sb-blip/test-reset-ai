@@ -109,6 +109,7 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
     <div class="card">
       <div class="row"><h2>今日やる3つ</h2><span class="muted" id="taskProg"></span></div>
       <div id="todayTasks"></div>
+      <div id="taskHint"></div>
       <button class="secondary" style="width:100%;margin-top:6px" onclick="openPlanChat()">今日の予定を変更する</button>
     </div>
 
@@ -149,7 +150,7 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
   <div class="card"><h2>① テスト日</h2><input type="date" id="testDate" oninput="draftDate=this.value" onchange="draftDate=this.value"></div>
   <div class="card">
     <div class="row"><h2>② 教科と目標点</h2><button onclick="addSubject()">＋教科を追加</button></div>
-    <div class="muted">前回の点数は、分からなければ空欄でOK。空欄のときは、苦手度から目安を出します。</div>
+    <div class="muted">前回の点数は、分からなければ空欄でOK。空欄のときは、苦手度から目安を出します。<br>「苦手な単元」を入れると、今日やることが具体的になります。</div>
     <div id="subjects"></div>
   </div>
   <div class="card">
@@ -171,19 +172,23 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
   <div class="seg"><button id="segAsk" class="on" onclick="chatTab('ask')">AIに相談</button><button id="segPlan" onclick="chatTab('plan')">今日の予定を変更</button></div>
   <div id="askPane">
     <div class="card">
-      <h2>AIに相談する</h2>
-      <div class="muted">質問を書くと、教科・テスト日・目標点を入れた文章を自動でつくります。コピー → 選んだAIを開く までワンタップ。あとは貼り付けて送信するだけです。</div>
-      <label>使うAI</label><select id="askAI" onchange="setAI(this.value)"><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="claude">Claude</option><option value="other">その他のAI</option></select>
+      <h2>🤖 AIに相談する</h2>
+      <div class="muted">選んだAIに質問するための文章を作ります<br>※回答はChatGPT・Gemini・Claudeなどの外部AIで行います</div>
+      <div class="divider"></div>
+      <h3>① 使うAIを選ぶ</h3>
+      <select id="askAI" onchange="setAI(this.value)"><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="claude">Claude</option><option value="other">その他のAI</option></select>
       <div id="askAIUrlRow" class="hidden"><label>開きたいAIのURL（https://…）</label><input id="askAIUrl" inputmode="url" placeholder="例：https://example.com/" oninput="setAIUrl(this.value)"></div>
-      <label>教科</label><select id="askSubject" onchange="askDirty()"></select>
-      <label>何をしたい？</label><select id="askTypeSel" onchange="onTypeChange();askDirty()"><option value="explain">わからない所を解説してほしい</option><option value="solve">問題の解き方を教えてほしい</option><option value="practice">演習問題を出してほしい</option><option value="quiz">一問一答でチェックしてほしい</option><option value="plan">勉強計画を相談したい</option></select>
-      <label>質問・問題文</label><textarea id="askText" oninput="askDirty()"></textarea>
-      <label>学年・レベル</label><input id="askGrade" placeholder="例：高校2年" oninput="askDirty()">
-      <label class="chk" id="askHintRow"><input type="checkbox" id="askHint" checked onchange="askDirty()"><span>答えをすぐ出さず、考え方・ヒントから教えてもらう</span></label>
-      <button style="width:100%;margin-top:12px;padding:14px" id="askGoBtn" onclick="askGo()">AIに相談する</button>
+      <h3 style="margin-top:20px">② 質問内容を確認</h3>
+      <label>教科</label><select id="askSubject" onchange="refreshPreview()"></select>
+      <label>何をしたい？</label><select id="askTypeSel" onchange="onTypeChange();refreshPreview()"><option value="explain">わからない所を解説してほしい</option><option value="solve">問題の解き方を教えてほしい</option><option value="practice">演習問題を出してほしい</option><option value="quiz">一問一答でチェックしてほしい</option><option value="plan">勉強計画を相談したい</option></select>
+      <label>質問・問題文</label><textarea id="askText" oninput="refreshPreview()"></textarea>
+      <label>学年・レベル</label><input id="askGrade" placeholder="例：高校2年" oninput="refreshPreview()">
+      <label class="chk" id="askHintRow"><input type="checkbox" id="askHint" checked onchange="refreshPreview()"><span>答えをすぐ出さず、考え方・ヒントから教えてもらう</span></label>
+      <label>AIに送る文章（自動で作られます。直接なおしてもOK）</label>
+      <textarea id="askPreviewBox" placeholder="質問を書くと、ここに文章ができます"></textarea>
+      <h3 style="margin-top:20px">③ コピーして開く</h3>
+      <button style="width:100%;padding:14px" id="askGoBtn" onclick="askGo()">📋 コピーして開く</button>
       <div class="muted" id="askGoNote" style="text-align:center;margin-top:6px"></div>
-      <button class="secondary" style="width:100%;margin-top:10px" onclick="showPreview()">作られる文章を確認・編集する</button>
-      <textarea id="askPreviewBox" class="hidden"></textarea>
       <div id="askStatus" class="askStatus"></div>
     </div>
     <div class="card"><h2>相談の履歴</h2><div id="askLog"></div></div>
@@ -230,7 +235,7 @@ function load(){
   let d=null;try{d=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}
   if(!d){let old=null;try{old=JSON.parse(localStorage.getItem('testResetAI_v1')||'null')}catch(e){}d=old?{...old}:{}}
   for(const k in DEF)if(d[k]===undefined)d[k]=JSON.parse(JSON.stringify(DEF[k]));
-  d.subjects=d.subjects.map(s=>({...s,current:s.current??'',target:s.target??'',confidence:s.confidence||3}));
+  d.subjects=d.subjects.map(s=>({...s,current:s.current??'',target:s.target??'',confidence:s.confidence||3,weak:s.weak??'',material:s.material??''}));
   if(!Array.isArray(d.weekMin)||d.weekMin.length!==7){
     const fresh=!d.testDate&&!d.subjects.length;
     d.weekMin=fresh?[120,60,60,60,60,60,120]:Array(7).fill(+d.availableMin||90);   // 日〜土
@@ -304,6 +309,7 @@ function renderHome(){
   if(!total){$('todayTasks').innerHTML=`<div class="empty">${avail<10?'今日は勉強できる時間が0分の設定です。<br>時間を変えるなら「今日の予定を変更する」から。':'今日のタスクはありません。'}</div>`}
   else if(doneN===total){$('todayTasks').innerHTML='<div class="notice good" style="margin-bottom:6px">🎉 今日のぶんは全部おわり！おつかれさま。</div>'+data.tasks.map(taskHTML).join('')}
   else $('todayTasks').innerHTML=data.tasks.map(taskHTML).join('');
+  $('taskHint').innerHTML=subs().some(s=>!parseUnits(s.weak).length)?`<div class="notice" style="margin-top:8px">💡 設定で「苦手な単元」を入れると、何をやるかがもっと具体的になります。<button class="mini secondary" style="margin-left:6px" onclick="show('setup')">入れる</button></div>`:'';
   const due=data.assignments.filter(a=>!a.done).sort((a,b)=>parseDate(a.due)-parseDate(b.due)).slice(0,3);
   $('dueList').innerHTML=due.length?due.map(a=>{const u=daysBetween(a.due,today());return `<div class="priorityItem"><b>${esc(a.name)}</b>${dueBadge(u)}</div>`}).join(''):'<div class="empty">提出物はありません（追加は「提出物」タブから）</div>';
   renderPriority();renderGoalPlan();renderChart();
@@ -312,7 +318,7 @@ function dueText(u){return u<0?`${-u}日すぎた`:u===0?'今日まで':`あと$
 function dueBadge(u){return `<span class="badge ${u<=1?'red':u<=3?'orange':''}">${dueText(u)}</span>`}
 function taskHTML(t){
   const running=data.timer&&data.timer.taskId===t.id;
-  const btn=t.done?'':running?'<span class="badge orange">計測中</span>':`<button class="mini" onclick="event.stopPropagation();startTimer('${t.id}')">▶ 始める</button>`;
+  const btn=t.done?'':(running?'<span class="badge orange">計測中</span>':`<button class="mini" onclick="event.stopPropagation();startTimer('${t.id}')">▶ 始める</button>`)+(t.askText?` <button class="mini secondary" onclick="event.stopPropagation();askAboutTask('${t.id}')">❓ わからない</button>`:'');
   return `<div class="task ${t.done?'done':''}" onclick="toggleTask('${t.id}')"><div class="check"></div><div style="flex:1"><div class="tt"><b>${esc(t.title)}</b></div><div class="muted">${esc(t.reason||'')} ・ 約${t.min}分${t.spent?`（記録ずみ${t.spent}分）`:''}</div>${btn?`<div style="margin-top:8px">${btn}</div>`:''}</div><span class="badge">${esc(t.subject||'')}</span></div>`;
 }
 function toggleTask(id){
@@ -340,15 +346,24 @@ function renderChart(){
 }
 
 /* ---------- タスク生成 ---------- */
+function parseUnits(w){return String(w||'').split(/[、,，\n;；]+/).map(x=>x.trim()).filter(Boolean)}
+function pickUnit(s){const u=parseUnits(s.weak);if(!u.length)return '';const dn=Math.floor(new Date(today()+'T00:00:00').getTime()/86400000);return u[dn%u.length]}
+function subjectTaskTitle(s,unit){
+  const mat=(s.material||'').trim();
+  if(unit)return s.name+'：'+unit+(+s.confidence>=4?'を基礎から復習':'の問題を解いて確認')+(mat?`（${mat}）`:'');
+  if(mat)return `${s.name}：${mat}の間違えた問題を解き直す`;
+  return `${s.name}：間違えた問題を解き直す`;
+}
+function workPlan(a,u){const m=String(a.work||'').match(/(\d+)\s*(ページ|頁|問|枚|章|単元|回)/);if(!m||!+m[1])return null;return{total:+m[1],unit:m[2],per:Math.ceil(+m[1]/Math.max(1,u))}}
 function generateTasks(){
   const avail=availToday();const pool=[];
   data.assignments.filter(a=>!a.done).forEach(a=>{
-    const u=Math.max(0,daysBetween(a.due,today()));
-    pool.push({title:a.name+'を進める',subject:'提出物',min:Math.max(10,Math.min(25,Math.floor(avail*.2))),score:u<=1?100:u<=2?85:u<=4?60:35,reason:u<=2?'期限が近い':'提出物を前倒し'});
+    const u=Math.max(0,daysBetween(a.due,today())),wp=workPlan(a,u);
+    pool.push({title:wp?`${a.name}を約${wp.per}${wp.unit}進める`:a.name+'を進める',subject:'提出物',min:Math.max(10,Math.min(25,Math.floor(avail*.2))),score:u<=1?100:u<=2?85:u<=4?60:35,reason:(u<=2?'期限が近い':'提出物を前倒し')+(wp?`・全${wp.total}${wp.unit}`:''),askText:`${a.name}で、わからない問題があります：`});
   });
   subs().forEach(s=>{
-    const {gap,est}=gapOf(s),base=Math.max(15,Math.floor(avail*.45));
-    pool.push({title:s.name+'：目標点に向けて重点演習',subject:s.name,min:gap===null?base:Math.min(base,Math.max(10,neededMinutes(s))),score:scoreSubject(s),reason:gap===null?`苦手度${s.confidence}/5`:gap>0?`目標まで${est?'約':''}${gap}点・苦手度${s.confidence}/5`:'目標点に到達ずみ'});
+    const {gap,est}=gapOf(s),base=Math.max(15,Math.floor(avail*.45)),unit=pickUnit(s);
+    pool.push({title:subjectTaskTitle(s,unit),subject:s.name,unit,min:gap===null?base:Math.min(base,Math.max(10,neededMinutes(s))),score:scoreSubject(s),reason:gap===null?`苦手度${s.confidence}/5`:gap>0?`目標まで${est?'約':''}${gap}点・苦手度${s.confidence}/5`:'目標点に到達ずみ',askText:unit?`${unit}で、わからないところがあります：`:`${s.name}で、わからない問題があります：`});
   });
   pool.sort((a,b)=>b.score-a.score);
   let mins=avail;const chosen=[];
@@ -416,13 +431,13 @@ function toggleAssign(i){const a=data.assignments[i];if(!a)return;a.done=!a.done
 function delAssign(i){const a=data.assignments[i];if(!a)return;openModal('提出物を削除',`「${a.name}」を削除しますか？`,'削除する',()=>{data.assignments.splice(i,1);save();refreshTasksSoft();renderAssign()})}
 
 /* ---------- 設定 ---------- */
-function addSubject(){data.subjects.push({id:uid(),name:'',confidence:3,current:'',target:''});renderSetup()}
+function addSubject(){data.subjects.push({id:uid(),name:'',confidence:3,current:'',target:'',weak:'',material:''});renderSetup()}
 function delSubject(i){data.subjects.splice(i,1);renderSetup()}
 let draftDate=null;   // 保存前に入力したテスト日（教科の追加・削除で再描画しても消えないように保持）
 function renderSetup(){
   syncAI();
   $('testDate').value=draftDate!==null?draftDate:data.testDate;
-  $('subjects').innerHTML=data.subjects.map((s,i)=>`<div class="subjectCard"><div class="row"><b>教科 ${i+1}</b><button class="mini danger" onclick="delSubject(${i})">削除</button></div><label>教科名</label><input value="${esc(s.name)}" placeholder="例：数学" oninput="data.subjects[${i}].name=this.value"><label>苦手度（1=得意、5=苦手）</label><select onchange="data.subjects[${i}].confidence=+this.value">${[1,2,3,4,5].map(n=>`<option value="${n}" ${s.confidence==n?'selected':''}>${n}</option>`).join('')}</select><div class="grid2"><div><label>前回のテストの点数（任意）</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="分からなければ空欄" value="${esc(s.current)}" oninput="data.subjects[${i}].current=this.value"></div><div><label>目標点</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="例：80" value="${esc(s.target)}" oninput="data.subjects[${i}].target=this.value"></div></div></div>`).join('')||'<div class="empty">「＋教科を追加」から入れてね。</div>';
+  $('subjects').innerHTML=data.subjects.map((s,i)=>`<div class="subjectCard"><div class="row"><b>教科 ${i+1}</b><button class="mini danger" onclick="delSubject(${i})">削除</button></div><label>教科名</label><input value="${esc(s.name)}" placeholder="例：数学" oninput="data.subjects[${i}].name=this.value"><label>苦手度（1=得意、5=苦手）</label><select onchange="data.subjects[${i}].confidence=+this.value">${[1,2,3,4,5].map(n=>`<option value="${n}" ${s.confidence==n?'selected':''}>${n}</option>`).join('')}</select><div class="grid2"><div><label>前回のテストの点数（任意）</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="分からなければ空欄" value="${esc(s.current)}" oninput="data.subjects[${i}].current=this.value"></div><div><label>目標点</label><input type="number" inputmode="numeric" min="0" max="100" placeholder="例：80" value="${esc(s.target)}" oninput="data.subjects[${i}].target=this.value"></div></div><details ${(s.weak||s.material)?'open':''} style="margin-top:12px"><summary class="muted" style="cursor:pointer">もっと具体的にする（任意）：苦手な単元・教材</summary><label>苦手な単元（「、」で区切る）</label><input value="${esc(s.weak)}" placeholder="例：二次関数、因数分解" oninput="data.subjects[${i}].weak=this.value"><label>使う教材</label><input value="${esc(s.material)}" placeholder="例：学校のワーク、青チャート" oninput="data.subjects[${i}].material=this.value"></details></div>`).join('')||'<div class="empty">「＋教科を追加」から入れてね。</div>';
   $('weekInputs').innerHTML=[1,2,3,4,5,6,0].map(i=>`<div class="wd"><label>${WD[i]}</label><input type="number" inputmode="numeric" min="0" step="5" value="${data.weekMin[i]}" oninput="data.weekMin[${i}]=Math.max(0,+this.value||0)"><span class="muted">分</span></div>`).join('');
 }
 function saveSetup(){
@@ -445,8 +460,8 @@ function syncAI(keepInputs){
   ['askAI','setAI'].forEach(id=>{$(id).value=data.ai});
   ['askAIUrlRow','setAIUrlRow'].forEach(id=>$(id).classList.toggle('hidden',!other));
   if(!keepInputs)['askAIUrl','setAIUrl'].forEach(id=>{$(id).value=data.aiUrl||''});
-  $('askGoBtn').textContent=ai.url?ai.name+'に相談する':'質問文をコピーする';
-  $('askGoNote').textContent=ai.url?'質問文を自動コピーして'+ai.name+'を開きます（アプリ側の費用は0円）':other?'URLを入れるとそのAIを開きます。空欄なら、コピーだけします。':'';
+  $('askGoBtn').textContent=ai.url?'📋 コピーして'+ai.name+'を開く':'📋 質問文をコピーする';
+  $('askGoNote').textContent=ai.url?'※回答はアプリ内ではなく、'+ai.name+'の画面に出ます':other?'URLを入れると、そのAIを開きます。空欄なら、コピーだけします。':'';
 }
 const ASK_SHORT={explain:'解説',solve:'解き方',practice:'演習',quiz:'一問一答',plan:'計画'};
 const ASK_PH={explain:'例：二次関数の頂点の求め方がわからない',solve:'例：次の問題を解きたい：（問題文をここに貼る）',practice:'例：二次関数の最大・最小の問題を出してほしい',quiz:'例：英語の不規則動詞を覚えたい',plan:'例：今日は疲れていて2時間しかできない。何から？（空でもOK）'};
@@ -454,14 +469,14 @@ function openAsk(){show('chat');chatTab('ask')}
 function openPlanChat(){show('chat');chatTab('plan')}
 function chatTab(w){const ask=w==='ask';$('askPane').classList.toggle('hidden',!ask);$('planPane').classList.toggle('hidden',ask);$('segAsk').classList.toggle('on',ask);$('segPlan').classList.toggle('on',!ask);if(ask)renderAsk();else renderChat()}
 function onTypeChange(){const t=val('askTypeSel');$('askText').placeholder=ASK_PH[t];$('askHintRow').classList.toggle('hidden',t==='quiz'||t==='plan')}
-function askDirty(){$('askPreviewBox').classList.add('hidden')}
+function refreshPreview(){const f=getAskForm();$('askPreviewBox').value=(f.type==='plan'||f.text.trim())?buildPrompt(f):''}
 function getAskForm(){return{subject:val('askSubject'),type:val('askTypeSel'),text:val('askText'),grade:val('askGrade').trim(),hint:$('askHint').checked}}
 function renderAsk(){
   const sel=$('askSubject'),cur=sel.value;
   sel.innerHTML=subs().map(s=>`<option value="${esc(s.name)}">${esc(s.name)}</option>`).join('')+'<option value="__none">その他（質問に書く）</option>';
   if(cur&&[...sel.options].some(o=>o.value===cur))sel.value=cur;
   const gr=$('askGrade');if(!gr.dataset.init){gr.value=data.grade||'';gr.dataset.init='1'}
-  syncAI();onTypeChange();renderAskLog();
+  syncAI();onTypeChange();renderAskLog();if(!$('askPreviewBox').value)refreshPreview();
 }
 function renderAskLog(){
   $('askLog').innerHTML=data.aiLog.length?data.aiLog.slice(0,10).map((x,i)=>`<div class="logItem" onclick="reuseAsk(${i})"><b>${esc(x.subject==='__none'?'その他':x.subject)}</b> <span class="badge">${esc(ASK_SHORT[x.type]||'')}</span><div class="muted">${esc(x.date)} ・ ${esc((x.text||'').slice(0,40))}${(x.text||'').length>40?'…':''}</div></div>`).join(''):'<div class="empty">まだ相談はありません</div>';
@@ -469,17 +484,18 @@ function renderAskLog(){
 function reuseAsk(i){
   const x=data.aiLog[i];if(!x)return;
   const sel=$('askSubject');if([...sel.options].some(o=>o.value===x.subject))sel.value=x.subject;
-  $('askTypeSel').value=x.type;$('askText').value=x.text||'';$('askHint').checked=x.hint!==false;onTypeChange();askDirty();window.scrollTo({top:0,behavior:'smooth'});
+  $('askTypeSel').value=x.type;$('askText').value=x.text||'';$('askHint').checked=x.hint!==false;onTypeChange();refreshPreview();window.scrollTo({top:0,behavior:'smooth'});
 }
 function buildPrompt(f){
   const d=daysUntil(),grade=f.grade||'高校生',sub=subs().find(s=>s.name===f.subject),ctx=[];
   if(data.testDate)ctx.push(`テスト日：${data.testDate}${d!==null&&d>=0?`（あと${d}日）`:''}`);
   if(sub)ctx.push(`教科：${sub.name}（前回${sub.current===''?'不明':sub.current+'点'} → 目標${sub.target===''?'不明':sub.target+'点'}、苦手度${sub.confidence}/5）`);
   else if(f.subject&&f.subject!=='__none')ctx.push(`教科：${f.subject}`);
+  if(sub){const wk=parseUnits(sub.weak);if(wk.length)ctx.push('苦手な単元：'+wk.join('、'));if((sub.material||'').trim())ctx.push('使っている教材：'+sub.material.trim())}
   if(f.type==='plan'){
     ctx.push(`今日の勉強可能時間：${availToday()}分`);
     ctx.push('曜日ごとの勉強可能時間：'+[1,2,3,4,5,6,0].map(i=>`${WD[i]}${data.weekMin[i]}分`).join('、'));
-    if(subs().length)ctx.push('全教科：'+subs().map(s=>`${s.name}(前回${s.current===''?'不明':s.current+'点'}、目標${s.target===''?'不明':s.target+'点'}、苦手度${s.confidence}/5)`).join('、'));
+    if(subs().length)ctx.push('全教科：'+subs().map(s=>`${s.name}(前回${s.current===''?'不明':s.current+'点'}、目標${s.target===''?'不明':s.target+'点'}、苦手度${s.confidence}/5${parseUnits(s.weak).length?'、苦手単元：'+parseUnits(s.weak).join('／'):''})`).join('、'));
     ctx.push('提出物：'+(data.assignments.filter(a=>!a.done).map(a=>`${a.name}(期限${a.due}、量${a.work||'不明'})`).join('、')||'なし'));
     const rest=data.tasks.filter(t=>!t.done);if(rest.length)ctx.push('今日の予定（未完了）：'+rest.map(t=>`${t.title}(${t.min}分)`).join('、'));
   }
@@ -491,17 +507,23 @@ function buildPrompt(f){
   else{ask='【相談したいこと】\n'+(q||'今日、何をどの順番でやるのがよいか決めたい');rules=['今日やることを最大3つに絞り、各タスクの時間（分）も決める','目標点との差・苦手度・期限・テストまでの日数を考慮する','各タスクに理由を1行で添える']}
   return `あなたは${grade}向けのやさしい家庭教師です。テスト勉強を手伝ってください。`+(ctx.length?'\n\n【状況】\n'+ctx.join('\n'):'')+'\n\n'+ask+'\n\n【お願い】\n- 日本語で答える\n'+rules.map(r=>'- '+r).join('\n');
 }
-function showPreview(){const f=getAskForm();if(f.type!=='plan'&&!f.text.trim()){alert('質問を書いてね');return}const pv=$('askPreviewBox');pv.value=buildPrompt(f);pv.classList.remove('hidden');pv.scrollIntoView({behavior:'smooth',block:'center'})}
 function askGo(){
-  const f=getAskForm();if(f.type!=='plan'&&!f.text.trim()){alert('質問を書いてね');return}
-  const pv=$('askPreviewBox'),st=$('askStatus');
-  const prompt=(!pv.classList.contains('hidden')&&pv.value.trim())?pv.value:buildPrompt(f);
-  pv.value=prompt;pv.classList.remove('hidden');
+  const f=getAskForm(),pv=$('askPreviewBox'),st=$('askStatus');
+  const prompt=pv.value.trim()||(f.type==='plan'?buildPrompt(f):'');
+  if(!prompt){alert('質問を書いてね');return}
+  pv.value=prompt;
   const ai=aiInfo(),link=ai.url?`<a href="${esc(ai.url)}" target="_blank" rel="noopener">${esc(ai.name)}を開く</a>`:'';
-  copyText(prompt).then(ok=>{st.innerHTML=ok?('✅ コピーしたよ。'+(ai.url?esc(ai.name)+'の入力欄に貼り付けて送信してね。<br>開かないときは '+link:'使いたいAIを開いて、貼り付けて送信してね。')):('⚠️ 自動コピーに失敗。上の文章を長押ししてコピーしてね。'+(link?'<br>→ '+link:''))});
+  copyText(prompt).then(ok=>{st.innerHTML=ok?('✅ コピーしたよ。'+(ai.url?esc(ai.name)+'の入力欄に貼り付けて送信してね。回答は'+esc(ai.name)+'の画面に出るよ。<br>開かないときは '+link:'使いたいAIを開いて、貼り付けて送信してね。')):('⚠️ 自動コピーに失敗。上の文章を長押ししてコピーしてね。'+(link?'<br>→ '+link:''))});
   if(ai.url)window.open(ai.url,'_blank','noopener');
   if(f.grade)data.grade=f.grade;
   data.aiLog.unshift({date:today(),subject:f.subject,type:f.type,text:f.text,hint:f.hint});data.aiLog=data.aiLog.slice(0,30);save();renderAskLog();
+}
+function askAboutTask(id){
+  const t=data.tasks.find(x=>x.id===id);if(!t)return;
+  show('chat');chatTab('ask');
+  const sel=$('askSubject');if(t.subject&&[...sel.options].some(o=>o.value===t.subject))sel.value=t.subject;
+  $('askTypeSel').value='explain';onTypeChange();$('askText').value=t.askText||'';refreshPreview();
+  $('askText').focus();
 }
 function copyPlanPrompt(){copyText(buildPrompt({type:'plan',subject:'__none',text:'',grade:data.grade,hint:false})).then(ok=>toast(ok?'コピーしたよ。使うAIに貼り付けてね':'コピーに失敗しました'))}
 
@@ -525,7 +547,7 @@ function handoffAsk(text){
   addMsg('AI','この質問は中身の解説が必要だから、AIに聞く形にしたよ。「AIに相談」に移したので、確認してボタンを押してね。');
   show('chat');chatTab('ask');
   const sub=subs().find(s=>text.includes(s.name));if(sub)$('askSubject').value=sub.name;
-  $('askTypeSel').value='explain';onTypeChange();$('askText').value=text;askDirty();
+  $('askTypeSel').value='explain';onTypeChange();$('askText').value=text;refreshPreview();
 }
 function localReply(t){
   let m=t.match(/(\d+(?:\.\d+)?)\s*時間/),mins=null;
@@ -534,7 +556,7 @@ function localReply(t){
   if(/サボ|できなかった|昨日|遅れ/.test(t)){generateTasks();return '遅れた分を全部取り返すのではなく、期限が近いものと、目標点との差が大きい教科を優先して組み直したよ。'}
   if(/終わっ|完了|できた/.test(t)){generateTasks();return 'おつかれ。残っているものから優先順位を更新したよ。'}
   const sj=subs().find(s=>t.includes(s.name));
-  if(sj){data.tasks.unshift({id:uid(),title:sj.name+'：重点演習',subject:sj.name,min:Math.min(30,Math.max(10,availToday())),score:999,reason:'相談で指定',done:false,spent:0});data.tasks=data.tasks.slice(0,3);data.tasksDate=today();save();return `${sj.name}を優先するように、今日のタスクを更新したよ。`}
+  if(sj){data.tasks.unshift({id:uid(),title:subjectTaskTitle(sj,pickUnit(sj)),subject:sj.name,unit:pickUnit(sj),askText:`${sj.name}で、わからない問題があります：`,min:Math.min(30,Math.max(10,availToday())),score:999,reason:'相談で指定',done:false,spent:0});data.tasks=data.tasks.slice(0,3);data.tasksDate=today();save();return `${sj.name}を優先するように、今日のタスクを更新したよ。`}
   if(/優先|順位|どれから|何から/.test(t)){generateTasks();const top=subs().sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];return top?`今の条件なら、まず${top.name}を優先する計画にしたよ。目標点との差・苦手度・テストまでの日数を合わせて計算しているよ。`:'まず設定で教科を入れてね。'}
   if(/目標|何点|点数/.test(t)){const s=subs().filter(x=>gapOf(x).gap!==null).sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];return s?`${s.name}は前回${s.current===''?'-':s.current+'点'} → 目標${s.target}点（${gapText(s)}）。必要な勉強時間の目安は合計${neededMinutes(s)}分、1日約${Math.ceil(neededMinutes(s)/Math.max(1,daysUntil()||1))}分。`:'設定で目標点を入れてね。'}
   return '了解。「今日は30分しかない」「昨日できなかった」「数学を優先したい」「目標点までどれくらい？」みたいな内容に対応できるよ。\nわからない問題の解説は「AIに相談」から聞いてね。';
