@@ -71,6 +71,7 @@ label{font-size:12px;color:var(--muted);display:block;margin:10px 0 5px}
 .tbin{pointer-events:auto;max-width:700px;width:calc(100% - 20px);background:#111827;color:#fff;border-radius:14px;padding:8px 8px 8px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 18px rgba(0,0,0,.25)}
 .tbin span{flex:1;font-weight:700;font-size:14px}.tbin b{font-variant-numeric:tabular-nums;font-size:16px}
 .tbin button{background:#fff;color:#111827;padding:8px 12px;font-size:13px}
+.task.running{border-color:#111827;box-shadow:0 0 0 2px rgba(17,24,39,.08)}.run{border:2px solid #111827}.tbin span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px}
 .modalBox{background:#fff;border-radius:20px;padding:22px;max-width:360px;width:100%}
 .modalBox h2{margin-top:0}.modalBox p{color:var(--muted);font-size:14px;line-height:1.7;margin:0 0 18px}
@@ -84,7 +85,7 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
 </head>
 <body>
 <div class="app">
-<header class="top"><h1>テスト前｜勉強計画</h1><p>開いたら、今日やることが3つ決まる</p></header>
+<header class="top"><h1>テスト前｜勉強計画</h1><p>開いたら、今日やることが決まる</p></header>
 <main>
 
 <!-- ホーム -->
@@ -95,7 +96,7 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
     <div class="step"><i>2</i><div><b>教科と目標点を入れる</b><div class="muted">前回の点数は、分からなければ空欄でOK</div></div></div>
     <div class="step"><i>3</i><div><b>曜日ごとの勉強できる時間を入れる</b><div class="muted">部活・塾の日は少なめでOK</div></div></div>
     <button style="width:100%;margin-top:10px" onclick="show('setup')">設定をはじめる</button>
-    <div class="muted" style="margin-top:12px;text-align:center">あとは「今日やる3つ」に従えばOK！</div>
+    <div class="muted" style="margin-top:12px;text-align:center">あとは「今日やること」に従えばOK！</div>
   </div>
 
   <div id="homeMain">
@@ -106,16 +107,20 @@ nav button b{display:block;font-size:18px;margin-bottom:2px}nav button.active{co
       <div class="stat"><span>目標点まで</span><strong id="stGap">-</strong></div>
     </div>
 
-    <div class="card">
-      <div class="row"><h2>今日やる3つ</h2><span class="muted" id="taskProg"></span></div>
-      <div id="todayTasks"></div>
-      <div id="taskHint"></div>
-      <button class="secondary" style="width:100%;margin-top:6px" onclick="openPlanChat()">今日の予定を変更する</button>
+    <div id="runCard" class="card run hidden">
+      <div class="muted" style="text-align:center">計測中</div>
+      <div class="tname" id="rcName"></div>
+      <div class="bigtime" id="tcTime">00:00</div>
+      <div id="rcMeter"><div class="meter"><i id="rcBar" style="width:0%"></i></div><div class="muted" id="rcSub" style="text-align:center;margin-top:6px"></div></div>
+      <div class="row" style="margin-top:12px"><button class="secondary" style="flex:1" onclick="stopTimer()">⏸ 終了して記録</button><button style="flex:1" id="rcNext" onclick="finishAndNext()">✓ 完了して次へ ▶</button></div>
     </div>
 
     <div class="card">
-      <h2>勉強タイマー</h2>
-      <div id="timerBody"></div>
+      <div class="row"><h2>今日やること</h2><span class="muted" id="taskProg"></span></div>
+      <div id="todayTasks"></div>
+      <div id="taskHint"></div>
+      <div class="grid2" style="margin-top:8px"><button class="secondary" onclick="addOneTask()">＋ もう1つ追加</button><button class="secondary" onclick="openPlanChat()">予定を変更する</button></div>
+      <details id="freeTimerBox" style="margin-top:12px"><summary class="muted" style="cursor:pointer">やること以外を計測する</summary><div id="freeTimerBody" style="margin-top:8px"></div></details>
     </div>
 
     <div class="card">
@@ -277,7 +282,7 @@ function gapText(s){const {gap,est}=gapOf(s);return gap===null?'':gap>0?`あと$
 function show(id){
   document.querySelectorAll('.screen').forEach(x=>x.classList.toggle('active',x.id===id));
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.s===id));
-  renderScreen(id);window.scrollTo(0,0);
+  renderScreen(id);renderTimer();window.scrollTo(0,0);
 }
 function renderScreen(id){({home:renderHome,assign:renderAssign,setup:renderSetup,chat:()=>{renderChat();renderAsk()},log:renderLog})[id]?.()}
 function activeId(){return document.querySelector('.screen.active').id}
@@ -306,9 +311,10 @@ function renderHome(){
   $('stGap').textContent=gaps.length?'あと'+(gaps.some(x=>x.est)?'約':'')+Math.max(...gaps.map(x=>x.gap))+'点':'-';
   const total=data.tasks.length,doneN=data.tasks.filter(t=>t.done).length;
   $('taskProg').textContent=total?`${doneN}/${total} 完了`:'';
-  if(!total){$('todayTasks').innerHTML=`<div class="empty">${avail<10?'今日は勉強できる時間が0分の設定です。<br>時間を変えるなら「今日の予定を変更する」から。':'今日のタスクはありません。'}</div>`}
-  else if(doneN===total){$('todayTasks').innerHTML='<div class="notice good" style="margin-bottom:6px">🎉 今日のぶんは全部おわり！おつかれさま。</div>'+data.tasks.map(taskHTML).join('')}
-  else $('todayTasks').innerHTML=data.tasks.map(taskHTML).join('');
+  const list=data.tasks.map((t,i)=>taskHTML(t,i)).join('');
+  if(!total){$('todayTasks').innerHTML=`<div class="empty">${avail<10?'今日は勉強できる時間が0分の設定です。<br>やりたいときは「＋ もう1つ追加」を押してね。':'今日やることはありません。「＋ もう1つ追加」で足せます。'}</div>`}
+  else if(doneN===total){$('todayTasks').innerHTML='<div class="notice good" style="margin-bottom:6px">🎉 今日のぶんは全部おわり！おつかれさま。もっとやるなら「＋ もう1つ追加」。</div>'+list}
+  else $('todayTasks').innerHTML=list;
   $('taskHint').innerHTML=subs().some(s=>!parseUnits(s.weak).length)?`<div class="notice" style="margin-top:8px">💡 設定で「苦手な単元」を入れると、何をやるかがもっと具体的になります。<button class="mini secondary" style="margin-left:6px" onclick="show('setup')">入れる</button></div>`:'';
   const due=data.assignments.filter(a=>!a.done).sort((a,b)=>parseDate(a.due)-parseDate(b.due)).slice(0,3);
   $('dueList').innerHTML=due.length?due.map(a=>{const u=daysBetween(a.due,today());return `<div class="priorityItem"><b>${esc(a.name)}</b>${dueBadge(u)}</div>`}).join(''):'<div class="empty">提出物はありません（追加は「提出物」タブから）</div>';
@@ -316,10 +322,11 @@ function renderHome(){
 }
 function dueText(u){return u<0?`${-u}日すぎた`:u===0?'今日まで':`あと${u}日`}
 function dueBadge(u){return `<span class="badge ${u<=1?'red':u<=3?'orange':''}">${dueText(u)}</span>`}
-function taskHTML(t){
+const NUM=['①','②','③','④','⑤','⑥'];
+function taskHTML(t,i){
   const running=data.timer&&data.timer.taskId===t.id;
   const btn=t.done?'':(running?'<span class="badge orange">計測中</span>':`<button class="mini" onclick="event.stopPropagation();startTimer('${t.id}')">▶ 始める</button>`)+(t.askText?` <button class="mini secondary" onclick="event.stopPropagation();askAboutTask('${t.id}')">❓ わからない</button>`:'');
-  return `<div class="task ${t.done?'done':''}" onclick="toggleTask('${t.id}')"><div class="check"></div><div style="flex:1"><div class="tt"><b>${esc(t.title)}</b></div><div class="muted">${esc(t.reason||'')} ・ 約${t.min}分${t.spent?`（記録ずみ${t.spent}分）`:''}</div>${btn?`<div style="margin-top:8px">${btn}</div>`:''}</div><span class="badge">${esc(t.subject||'')}</span></div>`;
+  return `<div class="task ${t.done?'done':''} ${running?'running':''}" onclick="toggleTask('${t.id}')"><div class="check"></div><div style="flex:1"><div class="tt"><b>${NUM[i]||''} ${esc(t.title)}</b></div><div class="muted">約${t.min}分 ・ ${esc(t.reason||'')}${t.spent?`（記録ずみ${t.spent}分）`:''}</div>${btn?`<div style="margin-top:8px">${btn}</div>`:''}</div><span class="badge">${esc(t.subject||'')}</span></div>`;
 }
 function toggleTask(id){
   const t=data.tasks.find(x=>x.id===id);if(!t)return;
@@ -355,61 +362,103 @@ function subjectTaskTitle(s,unit){
   return `${s.name}：間違えた問題を解き直す`;
 }
 function workPlan(a,u){const m=String(a.work||'').match(/(\d+)\s*(ページ|頁|問|枚|章|単元|回)/);if(!m||!+m[1])return null;return{total:+m[1],unit:m[2],per:Math.ceil(+m[1]/Math.max(1,u))}}
-function generateTasks(){
-  const avail=availToday();const pool=[];
+const r5=x=>Math.max(10,Math.round(x/5)*5);
+function buildPool(avail){
+  const pool=[];
   data.assignments.filter(a=>!a.done).forEach(a=>{
     const u=Math.max(0,daysBetween(a.due,today())),wp=workPlan(a,u);
-    pool.push({title:wp?`${a.name}を約${wp.per}${wp.unit}進める`:a.name+'を進める',subject:'提出物',min:Math.max(10,Math.min(25,Math.floor(avail*.2))),score:u<=1?100:u<=2?85:u<=4?60:35,reason:(u<=2?'期限が近い':'提出物を前倒し')+(wp?`・全${wp.total}${wp.unit}`:''),askText:`${a.name}で、わからない問題があります：`});
+    pool.push({title:wp?`${a.name}を約${wp.per}${wp.unit}進める`:a.name+'を進める',subject:'提出物',min:r5(Math.min(25,Math.max(10,Math.floor(avail*.2)))),score:u<=1?100:u<=2?85:u<=4?60:35,reason:(u<=2?'期限が近い':'提出物を前倒し')+(wp?`・全${wp.total}${wp.unit}`:''),askText:`${a.name}で、わからない問題があります：`});
   });
   subs().forEach(s=>{
-    const {gap,est}=gapOf(s),base=Math.max(15,Math.floor(avail*.45)),unit=pickUnit(s);
-    pool.push({title:subjectTaskTitle(s,unit),subject:s.name,unit,min:gap===null?base:Math.min(base,Math.max(10,neededMinutes(s))),score:scoreSubject(s),reason:gap===null?`苦手度${s.confidence}/5`:gap>0?`目標まで${est?'約':''}${gap}点・苦手度${s.confidence}/5`:'目標点に到達ずみ',askText:unit?`${unit}で、わからないところがあります：`:`${s.name}で、わからない問題があります：`});
+    const {gap,est}=gapOf(s),cap=Math.min(45,Math.max(15,Math.floor(avail*.45))),units=parseUnits(s.weak);
+    const need=gap===null?cap:Math.min(cap,Math.max(10,neededMinutes(s)));
+    const reason=gap===null?`苦手度${s.confidence}/5`:gap>0?`目標まで${est?'約':''}${gap}点・苦手度${s.confidence}/5`:'目標点に到達ずみ';
+    const first=pickUnit(s),list=[first];
+    if(units.length>=2)list.push(units[(units.indexOf(first)+1)%units.length]);   // 苦手単元が2つ以上なら、2つ目の候補も用意
+    list.forEach((unit,k)=>pool.push({title:subjectTaskTitle(s,unit),subject:s.name,unit,min:r5(k?need*.6:need),score:scoreSubject(s)*(k?.55:1),reason,askText:unit?`${unit}で、わからないところがあります：`:`${s.name}で、わからない問題があります：`}));
   });
-  pool.sort((a,b)=>b.score-a.score);
+  return pool.sort((a,b)=>b.score-a.score);
+}
+function generateTasks(){
+  // 勉強できる時間に収まる分だけ、優先順に並べる（件数は固定しない。最大6件）
+  const avail=availToday(),pool=buildPool(avail);
   let mins=avail;const chosen=[];
-  for(const x of pool){if(chosen.length>=3||mins<10)break;const m=Math.min(x.min,mins);chosen.push({...x,min:m,id:uid(),done:false,spent:0});mins-=m}
+  for(const x of pool){if(chosen.length>=6||mins<10)break;const m=Math.min(x.min,Math.floor(mins/5)*5);if(m<10)break;chosen.push({...x,min:m,id:uid(),done:false,spent:0});mins-=m}
   data.tasks=chosen;data.tasksDate=today();save();
+}
+function addOneTask(){
+  const have=new Set(data.tasks.map(t=>t.title)),x=buildPool(availToday()).find(p=>!have.has(p.title));
+  if(!x){toast('追加できる候補がありません。設定で苦手な単元を増やすと候補が増えます');return}
+  if(data.tasks.length>=8){toast('今日はもう十分！やることは8個までです');return}
+  data.tasks.push({...x,min:Math.max(10,Math.min(x.min,30)),id:uid(),done:false,spent:0});data.tasksDate=today();save();renderHome();toast('追加したよ：'+x.title);
 }
 function refreshTasksSoft(){if(setupDone()&&!data.tasks.some(t=>t.done||t.spent))generateTasks()}   // 進捗があるときは作り直さない
 
 /* ---------- 勉強タイマー ---------- */
 function fmtTime(ms){const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60,p=n=>String(n).padStart(2,'0');return (h?h+':':'')+p(m)+':'+p(ss)}
 function renderTimer(){
-  const t=data.timer;$('timerBar').classList.toggle('hidden',!t);
-  const keep=$('timerSubject')?$('timerSubject').value:'';
-  if(!t){
-    const opts=subs().map(s=>`<option>${esc(s.name)}</option>`).join('')+'<option>その他</option>';
-    $('timerBody').innerHTML=`<label style="margin-top:0">教科</label><select id="timerSubject">${opts}</select><button style="width:100%;margin-top:10px" onclick="startTimer()">▶ スタート</button><div class="muted" style="margin-top:8px">終了すると、勉強時間が自動で記録されます。</div>`;
-    const sel=$('timerSubject');if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;
+  const t=data.timer,onHome=activeId()==='home';
+  $('timerBar').classList.toggle('hidden',!t||onHome);
+  $('runCard').classList.toggle('hidden',!t);
+  $('freeTimerBox').classList.toggle('hidden',!!t);
+  if(t){
+    const task=t.taskId?data.tasks.find(x=>x.id===t.taskId):null;
+    $('rcName').textContent=t.title;$('tbName').textContent=t.title;
+    $('rcMeter').classList.toggle('hidden',!task);$('rcNext').classList.toggle('hidden',!task);
+    $('rcNext').textContent=nextUndone(t.taskId)?'✓ 完了して次へ ▶':'✓ 完了して終わる';
   }else{
-    $('timerBody').innerHTML=`<div class="tname">${esc(t.subject)}</div><div class="bigtime" id="tcTime">00:00</div><button style="width:100%" onclick="stopTimer()">⏸ 終了して記録</button>`;
-    $('tbName').textContent=t.subject;
+    const keep=$('timerSubject')?$('timerSubject').value:'';
+    const opts=subs().map(s=>`<option>${esc(s.name)}</option>`).join('')+'<option>その他</option>';
+    $('freeTimerBody').innerHTML=`<select id="timerSubject">${opts}</select><button style="width:100%;margin-top:10px" onclick="startTimer()">▶ スタート</button>`;
+    const sel=$('timerSubject');if(keep&&[...sel.options].some(o=>o.value===keep))sel.value=keep;
   }
   tickTimer();
 }
-function tickTimer(){const t=data.timer;if(!t)return;const f=fmtTime(Date.now()-t.start);$('tbTime').textContent=f;const c=$('tcTime');if(c)c.textContent=f}
+function tickTimer(){
+  const t=data.timer;if(!t)return;
+  const ms=Date.now()-t.start,f=fmtTime(ms);
+  $('tbTime').textContent=f;$('tcTime').textContent=f;
+  const task=t.taskId?data.tasks.find(x=>x.id===t.taskId):null;
+  if(task){
+    const planned=Math.max(0,task.min-(task.spent||0)),elapsed=ms/60000;
+    $('rcBar').style.width=(planned>0?Math.min(100,elapsed/planned*100):100)+'%';
+    $('rcSub').textContent=elapsed>=planned?'🎉 予定の時間になりました。おつかれさま！':`予定まであと約${Math.max(1,Math.ceil(planned-elapsed))}分（全${task.min}分）`;
+  }
+}
+// 記録だけ行う（画面更新なし）。markDone=true のときはタスクを完了にする。記録した分数を返す
+function commitTimer(markDone){
+  const t=data.timer;if(!t)return 0;
+  const min=Math.round((Date.now()-t.start)/60000);data.timer=null;
+  if(min>=1){data.logs.push({date:today(),min,task:t.title,subject:t.subject});data.history[today()]=(data.history[today()]||0)+min}
+  if(t.taskId){const k=data.tasks.find(x=>x.id===t.taskId);if(k){if(min>=1)k.spent=(k.spent||0)+min;if(markDone||k.spent>=k.min)k.done=true}}
+  save();return min;
+}
 function startTimer(taskId){
-  if(data.timer){toast('先に、いまの計測を終了してね');return}
   let subject,title;
   if(taskId){const t=data.tasks.find(x=>x.id===taskId);if(!t)return;subject=t.subject;title=t.title}
   else{subject=val('timerSubject')||'勉強';title=subject}
+  if(data.timer){
+    if(taskId&&data.timer.taskId===taskId)return;
+    if((Date.now()-data.timer.start)/60000>240){toast('先に、いまの計測を終了してね');return}
+    const prev=data.timer.subject,m=commitTimer(false);   // 別のタスクを押したら、いまの分を記録して切り替える
+    toast(m>=1?`${prev} ${m}分 を記録して、次を始めたよ`:'次を始めたよ');
+  }
   data.timer={taskId:taskId||null,subject,title,start:Date.now()};save();renderHome();
 }
 function stopTimer(){
   const t=data.timer;if(!t)return;
   const min=Math.round((Date.now()-t.start)/60000);
-  const finish=()=>{
-    data.timer=null;
-    if(min>=1){
-      data.logs.push({date:today(),min,task:t.title,subject:t.subject});
-      data.history[today()]=(data.history[today()]||0)+min;
-      if(t.taskId){const k=data.tasks.find(x=>x.id===t.taskId);if(k){k.spent=(k.spent||0)+min;if(k.spent>=k.min)k.done=true}}
-      toast(`${t.subject} ${min}分 を記録したよ`);
-    }else toast('1分未満だったので記録しませんでした');
-    save();renderHome();if(activeId()==='log')renderLog();
-  };
-  if(min>240)openModal('計測が長くなっています',`${min}分（約${Math.round(min/60)}時間）になっています。このまま記録しますか？`,'記録する',finish);
-  else finish();
+  const go=()=>{const m=commitTimer(false);toast(m>=1?`${t.subject} ${m}分 を記録したよ`:'1分未満だったので記録しませんでした');renderHome();if(activeId()==='log')renderLog()};
+  if(min>240)openModal('計測が長くなっています',`${min}分（約${Math.round(min/60)}時間）になっています。このまま記録しますか？`,'記録する',go);
+  else go();
+}
+function nextUndone(cur){const i=data.tasks.findIndex(x=>x.id===cur);return [...data.tasks.slice(i+1),...data.tasks.slice(0,Math.max(0,i))].find(x=>!x.done&&x.id!==cur)}   // いまの次 → 最初に戻って探す
+function finishAndNext(){
+  const t=data.timer;if(!t)return;
+  const m=commitTimer(true),next=nextUndone(t.taskId),rec=m>=1?`${m}分を記録。`:'';
+  if(next){data.timer={taskId:next.id,subject:next.subject,title:next.title,start:Date.now()};save();toast(rec+'次：'+next.title)}
+  else toast(rec+'今日のぶんは全部おわり🎉');
+  renderHome();if(activeId()==='log')renderLog();
 }
 setInterval(tickTimer,1000);
 
@@ -504,7 +553,7 @@ function buildPrompt(f){
   else if(f.type==='solve'){ask='【問題】\n'+q;rules=f.hint?['まず解き方のヒントを1つだけ出す','私が考えて返信したら、次のヒントを出す（詰まったら「ヒントちょうだい」と言います）','答えと途中式は、私が「答えを見せて」と言ってから出す']:['途中式つきで解き、なぜその式になるのかも説明する','最後に同じタイプの類題を1問出す']}
   else if(f.type==='practice'){ask='【練習したい内容】\n'+q;rules=['テストに出やすい形式で、やさしい→ふつう→やや難しいの順に3問出す',f.hint?'解答と解説は、私が答えてから出す（まず問題だけ見せる）':'各問の解答と解説もつける','間違えたときは、どこでつまずいたかも教える']}
   else if(f.type==='quiz'){ask='【チェックしたい範囲】\n'+q;rules=['一問一答形式で、1問ずつ出題する','私が答えたら、正誤と短い解説を返してから次の問題を出す','10問で一区切りにして、間違えた問題は最後にまとめて復習させる']}
-  else{ask='【相談したいこと】\n'+(q||'今日、何をどの順番でやるのがよいか決めたい');rules=['今日やることを最大3つに絞り、各タスクの時間（分）も決める','目標点との差・苦手度・期限・テストまでの日数を考慮する','各タスクに理由を1行で添える']}
+  else{ask='【相談したいこと】\n'+(q||'今日、何をどの順番でやるのがよいか決めたい');rules=['今日やることを、勉強できる時間に収まるように決め（多くても5個まで）、各タスクの時間（分）も決める','目標点との差・苦手度・期限・テストまでの日数を考慮する','各タスクに理由を1行で添える']}
   return `あなたは${grade}向けのやさしい家庭教師です。テスト勉強を手伝ってください。`+(ctx.length?'\n\n【状況】\n'+ctx.join('\n'):'')+'\n\n'+ask+'\n\n【お願い】\n- 日本語で答える\n'+rules.map(r=>'- '+r).join('\n');
 }
 function askGo(){
@@ -552,11 +601,11 @@ function handoffAsk(text){
 function localReply(t){
   let m=t.match(/(\d+(?:\.\d+)?)\s*時間/),mins=null;
   if(m)mins=Math.round(parseFloat(m[1])*60);else{m=t.match(/(\d+)\s*分/);if(m)mins=+m[1]}
-  if(mins!==null){data.todayOverride={date:today(),min:Math.max(0,mins)};generateTasks();return `今日は${mins}分として「今日やる3つ」を作り直したよ。（今日だけの変更で、明日からは曜日ごとの設定に戻るよ）`}
+  if(mins!==null){data.todayOverride={date:today(),min:Math.max(0,mins)};generateTasks();return `今日は${mins}分として「今日やること」を作り直したよ。（今日だけの変更で、明日からは曜日ごとの設定に戻るよ）`}
   if(/サボ|できなかった|昨日|遅れ/.test(t)){generateTasks();return '遅れた分を全部取り返すのではなく、期限が近いものと、目標点との差が大きい教科を優先して組み直したよ。'}
   if(/終わっ|完了|できた/.test(t)){generateTasks();return 'おつかれ。残っているものから優先順位を更新したよ。'}
   const sj=subs().find(s=>t.includes(s.name));
-  if(sj){data.tasks.unshift({id:uid(),title:subjectTaskTitle(sj,pickUnit(sj)),subject:sj.name,unit:pickUnit(sj),askText:`${sj.name}で、わからない問題があります：`,min:Math.min(30,Math.max(10,availToday())),score:999,reason:'相談で指定',done:false,spent:0});data.tasks=data.tasks.slice(0,3);data.tasksDate=today();save();return `${sj.name}を優先するように、今日のタスクを更新したよ。`}
+  if(sj){data.tasks.unshift({id:uid(),title:subjectTaskTitle(sj,pickUnit(sj)),subject:sj.name,unit:pickUnit(sj),askText:`${sj.name}で、わからない問題があります：`,min:Math.min(30,Math.max(10,availToday())),score:999,reason:'相談で指定',done:false,spent:0});data.tasks=data.tasks.slice(0,6);data.tasksDate=today();save();return `${sj.name}を優先するように、今日のタスクを更新したよ。`}
   if(/優先|順位|どれから|何から/.test(t)){generateTasks();const top=subs().sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];return top?`今の条件なら、まず${top.name}を優先する計画にしたよ。目標点との差・苦手度・テストまでの日数を合わせて計算しているよ。`:'まず設定で教科を入れてね。'}
   if(/目標|何点|点数/.test(t)){const s=subs().filter(x=>gapOf(x).gap!==null).sort((a,b)=>scoreSubject(b)-scoreSubject(a))[0];return s?`${s.name}は前回${s.current===''?'-':s.current+'点'} → 目標${s.target}点（${gapText(s)}）。必要な勉強時間の目安は合計${neededMinutes(s)}分、1日約${Math.ceil(neededMinutes(s)/Math.max(1,daysUntil()||1))}分。`:'設定で目標点を入れてね。'}
   return '了解。「今日は30分しかない」「昨日できなかった」「数学を優先したい」「目標点までどれくらい？」みたいな内容に対応できるよ。\nわからない問題の解説は「AIに相談」から聞いてね。';
